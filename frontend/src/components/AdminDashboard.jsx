@@ -18,6 +18,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
   // Allocation form state
   const [showAllocateModal, setShowAllocateModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState('');
+  const [residentName, setResidentName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [bedNumber, setBedNumber] = useState('');
 
@@ -110,7 +111,8 @@ const AdminDashboard = ({ token, user, onLogout }) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          studentId: selectedStudent,
+          phone: selectedStudent,
+          name: residentName,
           roomId: selectedRoom,
           bedNumber
         })
@@ -121,6 +123,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
       setSuccessMsg(data.message);
       setShowAllocateModal(false);
       setSelectedStudent('');
+      setResidentName('');
       setSelectedRoom('');
       setBedNumber('');
       fetchData();
@@ -259,7 +262,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-white font-heading">Siddu Admin</h1>
+            <h1 className="text-xl font-bold tracking-tight text-white font-heading">Siddu Premium Hostels and PGs</h1>
             <p className="text-xs text-slate-400">Warden/Owner Dashboard Control</p>
           </div>
         </div>
@@ -508,8 +511,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
                             <span className="text-xs text-slate-400 font-mono">ID: {student._id.substring(18)}</span>
                           </td>
                           <td className="p-4">
-                            <p className="text-slate-300">{student.email}</p>
-                            <p className="text-xs text-slate-500 font-mono">{student.phone}</p>
+                            <p className="text-slate-300 font-mono">{student.phone}</p>
                           </td>
                           <td className="p-4">
                             {student.room ? (
@@ -546,7 +548,8 @@ const AdminDashboard = ({ token, user, onLogout }) => {
                             ) : (
                               <button
                                 onClick={() => {
-                                  setSelectedStudent(student._id);
+                                  setSelectedStudent(student.phone);
+                                  setResidentName(student.name);
                                   setShowAllocateModal(true);
                                 }}
                                 className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-all glow-indigo cursor-pointer flex items-center gap-1.5"
@@ -816,22 +819,29 @@ const AdminDashboard = ({ token, user, onLogout }) => {
             </h3>
 
             <form onSubmit={handleAllocate} className="space-y-4">
+              {/* Resident Name */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Resident Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Amit Kumar (required if new resident)"
+                  value={residentName}
+                  onChange={(e) => setResidentName(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
               {/* Select Student */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Resident Student</label>
-                <select
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Resident Mobile Number</label>
+                <input
+                  type="text"
                   required
+                  placeholder="e.g. 8765432109"
                   value={selectedStudent}
                   onChange={(e) => setSelectedStudent(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none"
-                >
-                  <option value="">-- Select Resident --</option>
-                  {students.map(s => (
-                    <option key={s._id} value={s._id} disabled={!!s.room}>
-                      {s.name} {s.room ? `(Already Allocated - Room ${s.room.roomNumber})` : `(${s.phone})`}
-                    </option>
-                  ))}
-                </select>
+                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                />
               </div>
 
               {/* Select Room */}
@@ -872,6 +882,7 @@ const AdminDashboard = ({ token, user, onLogout }) => {
                   onClick={() => {
                     setShowAllocateModal(false);
                     setSelectedStudent('');
+                    setResidentName('');
                     setSelectedRoom('');
                     setBedNumber('');
                   }}

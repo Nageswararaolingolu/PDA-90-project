@@ -10,12 +10,12 @@ router.get('/', protect, async (req, res) => {
   try {
     if (req.user.role === 'admin') {
       const complaints = await Complaint.find({})
-        .populate('student', 'name email phone room bedNumber')
+        .populate('student', 'name phone room bedNumber')
         .sort({ createdAt: -1 });
       res.json(complaints);
     } else {
       const complaints = await Complaint.find({ student: req.user._id })
-        .populate('student', 'name email phone')
+        .populate('student', 'name phone')
         .sort({ createdAt: -1 });
       res.json(complaints);
     }
@@ -72,7 +72,7 @@ router.put('/:id', protect, async (req, res) => {
       await complaint.save();
       
       const updatedComplaint = await Complaint.findById(complaint._id)
-        .populate('student', 'name email phone room bedNumber');
+        .populate('student', 'name phone room bedNumber');
 
       return res.json({
         message: 'Complaint updated by admin',

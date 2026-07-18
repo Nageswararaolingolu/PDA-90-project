@@ -16,13 +16,13 @@ const generateToken = (id) => {
 // @access  Public
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    const { name, password, role, phone } = req.body;
 
-    if (!name || !email || !password || !phone) {
+    if (!name || !password || !phone) {
       return res.status(400).json({ message: 'Please fill in all fields' });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ phone });
 
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
@@ -30,7 +30,6 @@ router.post('/register', async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
       password,
       role: role || 'student',
       phone
@@ -40,7 +39,6 @@ router.post('/register', async (req, res) => {
       res.status(201).json({
         _id: user._id,
         name: user.name,
-        email: user.email,
         role: user.role,
         phone: user.phone,
         token: generateToken(user._id)
@@ -58,15 +56,14 @@ router.post('/register', async (req, res) => {
 // @access  Public
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ phone });
 
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
         name: user.name,
-        email: user.email,
         role: user.role,
         phone: user.phone,
         room: user.room,
@@ -75,7 +72,7 @@ router.post('/login', async (req, res) => {
         token: generateToken(user._id)
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid phone number or password' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

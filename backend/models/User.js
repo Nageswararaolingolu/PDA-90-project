@@ -8,13 +8,6 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true,
-    trim: true,
-    lowercase: true
-  },
   password: { 
     type: String, 
     required: true 
@@ -26,7 +19,9 @@ const UserSchema = new mongoose.Schema({
   },
   phone: { 
     type: String, 
-    required: true 
+    required: true,
+    unique: true,
+    trim: true
   },
   room: { 
     type: mongoose.Schema.Types.ObjectId, 

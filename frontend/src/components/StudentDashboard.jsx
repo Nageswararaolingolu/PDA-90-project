@@ -162,7 +162,7 @@ const StudentDashboard = ({ token, user, onLogout, onRefreshUserContext }) => {
             <Home className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-white font-heading">Siddu Resident</h1>
+            <h1 className="text-xl font-bold tracking-tight text-white font-heading">Siddu Premium Hostels and PGs</h1>
             <p className="text-xs text-slate-400">Student Dashboard Panel</p>
           </div>
         </div>

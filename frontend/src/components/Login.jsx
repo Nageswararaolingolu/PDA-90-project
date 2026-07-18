@@ -5,7 +5,6 @@ const Login = ({ onLoginSuccess }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     password: '',
     phone: '',
     role: 'student'
@@ -26,8 +25,8 @@ const Login = ({ onLoginSuccess }) => {
 
     const url = isRegister ? '/api/auth/register' : '/api/auth/login';
     const body = isRegister 
-      ? { name: formData.name, email: formData.email, password: formData.password, phone: formData.phone, role: formData.role }
-      : { email: formData.email, password: formData.password };
+      ? { name: formData.name, password: formData.password, phone: formData.phone, role: formData.role }
+      : { phone: formData.phone, password: formData.password };
 
     try {
       const response = await fetch(url, {
@@ -58,34 +57,7 @@ const Login = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleDemoLogin = async (role) => {
-    setError('');
-    setLoading(true);
-    const email = role === 'admin' ? 'admin@hostel.com' : 'student@hostel.com';
-    const password = 'password123';
 
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Demo login failed');
-      }
-
-      onLoginSuccess(data.token, data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a] p-4 relative overflow-hidden font-sans">
@@ -103,7 +75,7 @@ const Login = ({ onLoginSuccess }) => {
             Sid<span className="text-indigo-400">du</span>
           </h1>
           <p className="text-slate-400 mt-2 text-sm">
-            Premium PG & Hostel Management System
+            Premium Hostels and PGs
           </p>
         </div>
 
@@ -145,23 +117,6 @@ const Login = ({ onLoginSuccess }) => {
                   </div>
                 </div>
 
-                {/* Phone */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Phone Number</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      placeholder="e.g. 9876543210"
-                      className="w-full pl-11 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
                 {/* Role Switcher */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Registering As</label>
@@ -193,18 +148,18 @@ const Login = ({ onLoginSuccess }) => {
               </>
             )}
 
-            {/* Email */}
+            {/* Phone / Mobile Number */}
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Mobile Number</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
+                <Phone className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
                   onChange={handleChange}
                   required
-                  placeholder="name@example.com"
+                  placeholder="e.g. 9876543210"
                   className="w-full pl-11 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
@@ -258,34 +213,6 @@ const Login = ({ onLoginSuccess }) => {
             </button>
           </div>
 
-          <div className="relative my-6 flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700/60"></div>
-            </div>
-            <span className="relative px-3 bg-slate-800 text-xs font-medium text-slate-400 uppercase tracking-wider">
-              Quick Sandbox Access
-            </span>
-          </div>
-
-          {/* Sandbox Demo Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('admin')}
-              className="py-2.5 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 hover:border-slate-600/50 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <UserCheck className="w-4 h-4 text-emerald-400" />
-              <span>Admin Demo</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('student')}
-              className="py-2.5 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 hover:border-slate-600/50 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <UserCheck className="w-4 h-4 text-indigo-400" />
-              <span>Student Demo</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

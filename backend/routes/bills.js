@@ -14,14 +14,14 @@ router.get('/', protect, async (req, res) => {
       const bills = await Bill.find({})
         .populate({
           path: 'student',
-          select: 'name email phone room bedNumber',
+          select: 'name phone room bedNumber',
           populate: { path: 'room', select: 'roomNumber' }
         })
         .sort({ createdAt: -1 });
       res.json(bills);
     } else {
       const bills = await Bill.find({ student: req.user._id })
-        .populate('student', 'name email phone')
+        .populate('student', 'name phone')
         .sort({ createdAt: -1 });
       res.json(bills);
     }
@@ -129,7 +129,7 @@ router.put('/:id/status', protect, async (req, res) => {
 // @access  Private (Admin Only)
 router.post('/:id/remind', protect, adminOnly, async (req, res) => {
   try {
-    const bill = await Bill.findById(req.params.id).populate('student', 'name email');
+    const bill = await Bill.findById(req.params.id).populate('student', 'name phone');
     if (!bill) {
       return res.status(404).json({ message: 'Bill not found' });
     }
@@ -138,7 +138,7 @@ router.post('/:id/remind', protect, adminOnly, async (req, res) => {
     await bill.save();
 
     res.json({
-      message: `Mock notification reminder sent to ${bill.student.name} (${bill.student.email})`,
+      message: `Mock notification reminder sent to ${bill.student.name} (${bill.student.phone})`,
       bill
     });
   } catch (error) {

@@ -9,7 +9,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 // @access  Private (Admin Only)
 router.get('/', protect, adminOnly, async (req, res) => {
   try {
-    const rooms = await Room.find({}).populate('students', 'name email phone');
+    const rooms = await Room.find({}).populate('students', 'name phone');
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,10 +52,10 @@ router.post('/', protect, adminOnly, async (req, res) => {
 // @access  Private (Admin Only)
 router.post('/allocate', protect, adminOnly, async (req, res) => {
   try {
-    const { studentId, roomId, bedNumber } = req.body;
+    const { studentId, phone, roomId, bedNumber, name } = req.body;
 
-    if (!studentId || !roomId || !bedNumber) {
-      return res.status(400).json({ message: 'Please specify studentId, roomId, and bedNumber' });
+    if ((!studentId && !phone) || !roomId || !bedNumber) {
+      return res.status(400).json({ message: 'Please specify student identifier (studentId or phone), roomId, and bedNumber' });
     }
 
     const room = await Room.findById(roomId);
@@ -63,9 +63,23 @@ router.post('/allocate', protect, adminOnly, async (req, res) => {
       return res.status(404).json({ message: 'Room not found' });
     }
 
-    const student = await User.findById(studentId);
+    let student;
+    if (phone) {
+      student = await User.findOne({ phone: phone.trim() });
+      if (!student && name) {
+        student = await User.create({
+          name: name.trim(),
+          phone: phone.trim(),
+          password: 'password123',
+          role: 'student'
+        });
+      }
+    } else if (studentId) {
+      student = await User.findById(studentId);
+    }
+
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: 'Student not found. Please provide a name to register them manually.' });
     }
 
     if (student.role !== 'student') {

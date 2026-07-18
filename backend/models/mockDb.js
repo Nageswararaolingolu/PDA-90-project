@@ -242,7 +242,6 @@ const seedMockDb = async () => {
     db.users.push({
       _id: 'user_admin',
       name: 'Warden Ramesh',
-      email: 'admin@hostel.com',
       password: hashedPassword,
       role: 'admin',
       phone: '9876543210',
@@ -256,7 +255,6 @@ const seedMockDb = async () => {
     db.users.push({
       _id: 'user_student1',
       name: 'Amit Kumar',
-      email: 'student@hostel.com',
       password: hashedPassword,
       role: 'student',
       phone: '8765432109',
@@ -272,7 +270,6 @@ const seedMockDb = async () => {
     db.users.push({
       _id: 'user_student2',
       name: 'Rohan Sharma',
-      email: 'rohan@hostel.com',
       password: hashedPassword,
       role: 'student',
       phone: '7654321098',
