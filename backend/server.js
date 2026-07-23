@@ -14,6 +14,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Lazy-initialized database connection & seeding promise to avoid cold-start race conditions
+let dbInitPromise = null;
+const getDbInitPromise = () => {
+  if (!dbInitPromise) {
+    dbInitPromise = (async () => {
+      // Connect to Database
+      await connectDB();
+      // Seed Database (will skip if data exists)
+      await seedData();
+    })();
+  }
+  return dbInitPromise;
+};
+
+// Middleware to ensure DB connection / mock fallback is fully completed before processing requests
+app.use(async (req, res, next) => {
+  try {
+    await getDbInitPromise();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
@@ -34,16 +58,16 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  // Connect to Database
-  await connectDB();
-  
-  // Seed Database (will skip if data exists)
-  await seedData();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Listen only when running locally (not in serverless production on Vercel)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  getDbInitPromise().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }).catch(err => {
+    console.error('Database connection failed during boot:', err);
   });
-};
+}
 
-startServer();
+module.exports = app;
+
